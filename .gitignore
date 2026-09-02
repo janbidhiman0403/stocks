@@ -1,0 +1,25 @@
+# Local Python environment
+.venv/
+venv/
+
+# Python caches
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Local secrets and configuration
+.env
+.env.*
+!.env.example
+
+# Generated model artifacts
+*.pkl
+*.joblib
+*.model
+*.json
+
+# Editor and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
