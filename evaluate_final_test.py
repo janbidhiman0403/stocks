@@ -94,7 +94,12 @@ model.fit(
     X_development,
     y_development
 )
+joblib.dump(
+    model,
+    "models/xgboost_regression_final.pkl"
+)
 
+print("Model saved: models/xgboost_regression_final.pkl")
 
 # ==============================
 # FINAL TEST PREDICTIONS
