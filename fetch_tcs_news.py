@@ -2,62 +2,66 @@ import feedparser
 import pandas as pd
 from datetime import datetime
 from pathlib import Path
-
-# ==============================
-# SETTINGS
-# ==============================
-
-RSS_URL = "https://news.google.com/rss/search?q=TCS+Tata+Consultancy+Services&hl=en-IN&gl=IN&ceid=IN:en"
+from urllib.parse import quote
 
 OUTPUT_FILE = Path("data/news/TCS_news.csv")
 
-# ==============================
-# FETCH NEWS
-# ==============================
-
-print("Fetching TCS news...")
-
-feed = feedparser.parse(RSS_URL)
-
-print("Articles found:", len(feed.entries))
-
-# ==============================
-# EXTRACT ARTICLES
-# ==============================
+queries = [
+    "TCS Tata Consultancy Services 2024",
+    "TCS Tata Consultancy Services 2025",
+    "TCS Tata Consultancy Services 2026"
+]
 
 articles = []
 
-for entry in feed.entries:
+print("Fetching expanded TCS news history...")
 
-    title = entry.get("title", "").strip()
-    url = entry.get("link", "").strip()
+for query in queries:
 
-    source = ""
+    rss_url = (
+        "https://news.google.com/rss/search?q="
+        + quote(query)
+        + "&hl=en-IN&gl=IN&ceid=IN:en"
+    )
 
-    if "source" in entry:
-        source = entry.source.get("title", "").strip()
+    print("\nQuery:", query)
 
-    published = entry.get("published", "")
+    feed = feedparser.parse(rss_url)
 
-    try:
-        published_date = pd.to_datetime(published).date()
-    except:
-        published_date = datetime.now().date()
+    print("Articles found:", len(feed.entries))
 
-    if title:
-        articles.append({
-            "Date": published_date,
-            "Headline": title,
-            "Source": source,
-            "URL": url
-        })
+    for entry in feed.entries:
 
-# ==============================
-# SAVE CSV
-# ==============================
+        title = entry.get("title", "").strip()
+        url = entry.get("link", "").strip()
+
+        source = ""
+
+        if "source" in entry:
+            source = entry.source.get("title", "").strip()
+
+        published = entry.get("published", "")
+
+        try:
+            published_date = pd.to_datetime(published).date()
+        except:
+            published_date = datetime.now().date()
+
+        if title:
+            articles.append({
+                "Date": published_date,
+                "Headline": title,
+                "Source": source,
+                "URL": url
+            })
+
 
 new_data = pd.DataFrame(articles)
 
+# Remove duplicate URLs
+new_data = new_data.drop_duplicates(subset=["URL"])
+
+# Load existing data if present
 if OUTPUT_FILE.exists() and OUTPUT_FILE.stat().st_size > 0:
 
     existing_data = pd.read_csv(OUTPUT_FILE)
@@ -67,18 +71,28 @@ if OUTPUT_FILE.exists() and OUTPUT_FILE.stat().st_size > 0:
         ignore_index=True
     )
 
-    combined = combined.drop_duplicates(
-        subset=["URL"]
-    )
+    combined = combined.drop_duplicates(subset=["URL"])
 
 else:
 
     combined = new_data
+
+
+combined["Date"] = pd.to_datetime(
+    combined["Date"]
+).dt.date
+
+combined = combined.sort_values("Date")
 
 combined.to_csv(
     OUTPUT_FILE,
     index=False
 )
 
-print("Saved:", OUTPUT_FILE)
+print("\nExpanded news dataset saved!")
+print("File:", OUTPUT_FILE)
 print("Total unique articles:", len(combined))
+
+print("\nDate range:")
+print("First:", combined["Date"].min())
+print("Last:", combined["Date"].max())
