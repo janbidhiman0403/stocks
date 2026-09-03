@@ -1,4 +1,5 @@
 import pandas as pd
+import joblib
 from xgboost import XGBRegressor
 
 # ==============================
@@ -99,8 +100,7 @@ joblib.dump(
     "models/xgboost_regression_final.pkl"
 )
 
-print("Model saved: models/xgboost_regression_final.pkl")
-
+model = joblib.load("models/xgboost_regression_final.pkl")
 # ==============================
 # FINAL TEST PREDICTIONS
 # ==============================

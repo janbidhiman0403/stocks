@@ -157,12 +157,12 @@ print("Expected features:", len(model_features))
 print("Missing features:", missing_features)
 
 if not missing_features:
-    print("PASS: All 26 model features are present.")
+    print("PASS: All 19 model features are present.")
 else:
     print("FAIL: Some model features are missing.")
     import joblib
 
-model = joblib.load("models/xgboost_regression_v3.pkl")
+model = joblib.load("models/xgboost_regression_final.pkl")
 
 latest_features = df[model_features].iloc[[-1]]
 
@@ -171,3 +171,82 @@ prediction = model.predict(latest_features)[0]
 print("\nLatest Model Prediction:")
 print("Predicted 5D Return:", prediction)
 print("Predicted 5D Return %:", prediction * 100)
+# ==============================
+# ALPHALENS SIGNAL
+# ==============================
+
+buy_threshold = 0.00443
+
+if prediction >= buy_threshold:
+    signal = "BUY"
+elif prediction <= -buy_threshold:
+    signal = "AVOID"
+else:
+    signal = "HOLD"
+
+print("\nAlphaLens Signal:")
+print("Signal:", signal)
+print("Threshold:", buy_threshold * 100, "%")
+# ==============================
+# SIGNAL STRENGTH
+# ==============================
+
+prediction_percent = prediction * 100
+
+if abs(prediction_percent) >= 3:
+    signal_strength = "Very Strong"
+elif abs(prediction_percent) >= 2:
+    signal_strength = "Strong"
+elif abs(prediction_percent) >= 1:
+    signal_strength = "Moderate"
+else:
+    signal_strength = "Weak"
+
+print("Signal Strength:", signal_strength)
+# ==============================
+# CONFIDENCE SCORE
+# ==============================
+
+# Historical directional accuracy of the final test
+base_confidence = 50.39
+
+# Increase confidence when prediction is farther from the signal threshold
+prediction_strength = abs(prediction) / buy_threshold
+
+confidence_bonus = min(prediction_strength * 5, 15)
+
+confidence = min(base_confidence + confidence_bonus, 65)
+
+print("\nConfidence Assessment:")
+print("Confidence:", round(confidence, 2), "%")
+# ==============================
+# RISK SCORE
+# ==============================
+
+volatility = latest["Volatility_20"]
+
+if volatility < 0.01:
+    risk_score = 20
+elif volatility < 0.015:
+    risk_score = 35
+elif volatility < 0.02:
+    risk_score = 50
+elif volatility < 0.025:
+    risk_score = 65
+elif volatility < 0.03:
+    risk_score = 80
+else:
+    risk_score = 95
+
+if risk_score <= 35:
+    risk_category = "Low"
+elif risk_score <= 65:
+    risk_category = "Moderate"
+elif risk_score <= 80:
+    risk_category = "High"
+else:
+    risk_category = "Very High"
+
+print("\nRisk Assessment:")
+print("Risk Score:", risk_score, "/ 100")
+print("Risk Category:", risk_category)
