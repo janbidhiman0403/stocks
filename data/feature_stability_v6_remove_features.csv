@@ -1,0 +1,1 @@
+Feature,Data_Type,Unique_Values,Missing_Rate,Constant_Rate,Full_Sample_AUC,Mean_Period_AUC,Median_Period_AUC,Std_Period_AUC,Min_Period_AUC,Max_Period_AUC,Periods_AUC_GE_0.55,Stability_Score,Target_Correlation,Leakage_Name_Flag,Classification
