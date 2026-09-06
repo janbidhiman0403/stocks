@@ -1,0 +1,2 @@
+Model,Base_Threshold,Best_Regime,Thresholds_Tested,Holding_Periods_Tested,Positive_Return_Combinations,Total_Best_Regime_Combinations,Positive_Return_Fraction,Positive_Sharpe_Combinations,Mean_Return,Median_Return,Best_Return,Best_Sharpe,Best_Max_Drawdown
+XGBoost,0.7,Strong_Downtrend_HighVol,"0.6,0.65,0.7,0.75,0.8","5,10,15,20",10,20,0.5,11,0.11271325348436938,-0.008332655192576699,0.9441890429602715,11.392358418732647,-0.046346625313577805
